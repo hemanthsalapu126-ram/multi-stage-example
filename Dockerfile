@@ -1,17 +1,20 @@
 # Build Stage
-FROM eclipse-temurin:8-jdk AS builder
+FROM maven:3.9.6-eclipse-temurin-8 AS builder
 
-WORKDIR /app/source
+WORKDIR /app
 
-COPY . .
+COPY pom.xml .
+COPY src ./src
 
-RUN javac HelloWorld.java
+RUN mvn clean package -DskipTests
 
 # Runtime Stage
 FROM eclipse-temurin:8-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/source/HelloWorld.class .
+COPY --from=builder /app/target/*.jar app.jar
 
-CMD ["java", "HelloWorld"]
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","app.jar"]
