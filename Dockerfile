@@ -1,10 +1,9 @@
 # Build Stage
-FROM maven:3.9.6-eclipse-temurin-8 AS builder
+FROM maven:3.8.8-eclipse-temurin-8 AS builder
 
 WORKDIR /app
 
-COPY pom.xml .
-COPY src ./src
+COPY . .
 
 RUN mvn clean package -DskipTests
 
