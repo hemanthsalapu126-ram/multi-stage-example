@@ -1,11 +1,19 @@
-FROM openjdk:8-jdk-alpine as builder
-RUN mkdir -p /app/source
-COPY . /app/source
-WORKDIR /app/source
-RUN ./mvnw clean package
+# Build Stage
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
+WORKDIR /app
 
-FROM builder
-COPY --from=builder /app/source/target/*.jar /app/app.jar
+COPY . .
+
+RUN mvn clean package
+
+# Runtime Stage
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
+
+ENTRYPOINT ["java","-jar","app.jar"]
